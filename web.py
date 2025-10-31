@@ -1,14 +1,37 @@
 import json
 import os
 import time
-from flask import Flask, render_template_string, abort, request, url_for
+from flask import Flask, render_template_string, abort, request, url_for, Response
+from functools import wraps
 
 
 app = Flask(__name__)
 
 
+def validate_lang(f):
+    """验证语言参数装饰器"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        lang = request.args.get('lang', 'zh')
+        if lang not in ['zh', 'en']:
+            abort(400, description='Invalid lang parameter')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@app.after_request
+def set_security_headers(response: Response):
+    """添加安全响应头"""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Content-Security-Policy'] = "default-src 'self' 'unsafe-inline' https:"
+    return response
+
+
 def load_last_json():
-    last_path = os.path.join(os.path.dirname(__file__), 'last.json')
+    last_path = os.path.join(os.path.dirname(
+        __file__), 'json_files', 'last.json')
     if not os.path.exists(last_path):
         abort(404, description='last.json not found')
     with open(last_path, 'r', encoding='utf-8') as f:
@@ -23,11 +46,12 @@ def format_ts(ts):
 
 
 @app.route('/')
+@validate_lang
 def index():
     data = load_last_json()
     # Expect data['positions'] to be a list of model snapshots
     models = data.get('positions', [])
-    
+
     # Calculate unrealized and total PnL for each model
     for m in models:
         realized_pnl = m.get('realized_pnl', 0.0) or 0.0
@@ -37,9 +61,10 @@ def index():
             unrealized_pnl += (pos.get('unrealized_pnl', 0.0) or 0.0)
         m['unrealized_pnl'] = unrealized_pnl
         m['total_pnl'] = realized_pnl + unrealized_pnl
-    
+
     # Sort by realized_pnl descending
-    models = sorted(models, key=lambda m: (m.get('realized_pnl') or 0.0), reverse=True)
+    models = sorted(models, key=lambda m: (
+        m.get('realized_pnl') or 0.0), reverse=True)
 
     # Extract a sorted list of all symbols observed across models for header consistency
     all_symbols = set()
@@ -76,7 +101,6 @@ def index():
         'toggle': 'English' if not is_en else '中文',
         'contact': '联系方式' if not is_en else 'Contact',
         'nof1': 'nof1.ai' if not is_en else 'nof1.ai',
-        'wechat_mp': '公众号:远见拾贝' if not is_en else 'WeChat MP',
         'x': 'X' if is_en else 'X',
         'github': 'Github' if not is_en else 'GitHub',
         'site': '网站' if not is_en else 'Site',
@@ -117,11 +141,10 @@ def index():
   <div class="topbar">
     {{ t['contact'] }}:
     <a href="https://nof1.ai" target="_blank" rel="noopener">{{ t['nof1'] }}</a>
-    <a href="https://www.insightpearl.com/" target="_blank" rel="noopener">{{ t['site'] }}</a>
-    <a href="https://x.com/okay456okay" target="_blank" rel="noopener">{{ t['x'] }}</a>
-    <a href="https://github.com/okay456okay/nof1.ai.monitor" target="_blank" rel="noopener">{{ t['github'] }}</a>
-    <a href="https://www.insightpearl.com/" target="_blank" rel="noopener">{{ t['wechat_mp'] }}</a>
-    | <a href="{{ url_for('index', lang='en' if not is_en else 'zh') }}">{{ t['toggle'] }}</a>
+    <a href="https://www.zf-talk.com/" target="_blank" rel="noopener">{{ t['site'] }}</a>
+    <a href="https://x.com/zf_talk" target="_blank" rel="noopener">{{ t['x'] }}</a>
+    <a href="https://github.com/sniperyen/nof1.ai.monitor" target="_blank" rel="noopener">{{ t['github'] }}</a>
+  | <a href="{{ url_for('index', lang='en' if not is_en else 'zh') }}">{{ t['toggle'] }}</a>
   </div>
   <div class="spacer"></div>
   <h1>{{ t['title'] }}</h1>
@@ -204,7 +227,7 @@ if __name__ == '__main__':
     # Allow host binding via env var if needed
     host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', '5010'))
-    debug = os.getenv('FLASK_DEBUG', '0') == '1'
+    # 安全修复：确保生产环境不开启调试模式
+    debug = os.getenv('FLASK_DEBUG', '0') == '1' and os.getenv(
+        'FLASK_ENV') != 'production'
     app.run(host=host, port=port, debug=debug)
-
-

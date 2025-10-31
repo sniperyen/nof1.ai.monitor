@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 项目特定
+*.md
+.git/
+.gitignore
+.github/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 测试
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 文档
+docs/
+*.rst
+
+# 日志和数据（运行时生成）
+logs/*.log
+data/*.json
+!data/.gitkeep
+
+# 配置示例
+*.example
+env.example
+
+# MacOS
+.DS_Store
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+

@@ -42,8 +42,13 @@ current.json
 last.json
 account-totals.json
 data/
+json_files/
 # 保留示例数据文件
 !account-totals.json.example
+!json_files/.gitkeep
+
+# AI generated discussion documents
+discuss/
 
 # IDE
 .vscode/

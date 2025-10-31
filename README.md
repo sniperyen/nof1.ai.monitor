@@ -1,8 +1,8 @@
-# nof1.ai Alpha Arena AI大模型交易监控系统
+# nof1.ai Alpha Arena AI 大模型交易监控系统
 
 中文 | [English](README.en.md)
 
-监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
+监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI 大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
@@ -10,7 +10,7 @@
 
 ## 重要提醒
 
-**由于nof1.ai网站接口变更以及数据对齐问题，之前的版本存在问题，请大家更新到最新版本(git pull)**
+**由于 nof1.ai 网站接口变更以及数据对齐问题，之前的版本存在问题，请大家更新到最新版本(git pull)**
 
 ## ⚠️ 免责声明
 
@@ -23,15 +23,15 @@
 
 ## 功能特性
 
-- 🔄 **定时监控**: 每分钟自动获取Alpha Arena持仓数据
+- 🔄 **定时监控**: 每分钟自动获取 Alpha Arena 持仓数据
 - 📊 **变化检测**: 智能分析持仓变化，识别交易行为
 - 📱 **实时通知**: 通过企业微信群机器人、Telegram 发送交易提醒（可选多通道）
-- 🌐 **持仓表格页面**: 内置 Flask 页面展示各模型持仓，支持中英文切换，15秒自动刷新
+- 🌐 **持仓表格页面**: 内置 Flask 页面展示各模型持仓，支持中英文切换，15 秒自动刷新
 - 🎯 **精准监控**: 支持指定特定模型进行监控
 - 📝 **详细日志**: 完整的操作日志记录
 - ⚙️ **灵活配置**: 通过环境变量进行配置管理
 
-**持仓页面在线访问：** [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+**持仓页面在线访问：** [https://alpha.zf-talk.com/](https://alpha.zf-talk.com/)
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div>
@@ -44,7 +44,8 @@
   </div>
 </div>
 
-**通知示例:** 
+**通知示例:**
+
 ```
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-28 22:30:56
@@ -67,7 +68,63 @@ AI交易监控系统
 └── config.env.example    # 配置文件示例
 ```
 
-## 安装和配置
+## 🐳 Docker 部署（推荐）
+
+使用 Docker 可以快速部署，无需手动配置 Python 环境。
+
+### 快速开始
+
+```bash
+# 1. 配置环境变量
+cp env.example .env
+# 编辑 .env 文件，配置必要的参数
+
+# 2. 构建镜像
+make build
+
+# 3. 启动服务
+make up
+
+# 4. 访问 Web 界面
+# 浏览器打开: http://localhost:5010
+```
+
+就这么简单！🎉
+
+### 常用命令
+
+```bash
+make build       # 构建 Docker 镜像
+make up          # 启动所有服务（监控 + Web）
+make down        # 停止所有服务
+make restart     # 重启所有服务
+make logs        # 查看所有服务日志
+make logs-monitor # 查看监控服务日志
+make logs-web    # 查看 Web 服务日志
+make test        # 测试通知功能
+make status      # 查看服务状态
+make shell       # 进入监控服务容器 shell
+make help        # 查看所有可用命令
+```
+
+### Docker Compose 服务说明
+
+- **monitor**: 交易监控服务，负责获取数据并发送通知
+- **web**: Web 展示服务，提供持仓表格界面
+
+两个服务共享数据文件（`current.json` 和 `last.json`），实现数据同步。
+
+### 详细文档
+
+查看 [DOCKER.md](DOCKER.md) 了解更多部署细节、故障排除和高级配置。
+
+### 查看帮助
+
+```bash
+make help  # 查看所有可用命令
+```
+
+## 本地安装和配置
 
 ### 1. 安装依赖
 
@@ -82,6 +139,7 @@ pip install -r requirements.txt
 ### 2. 配置环境变量
 
 复制配置文件模板：
+
 ```bash
 cp env.example .env
 ```
@@ -112,11 +170,11 @@ LOG_LEVEL=INFO
 SAVE_HISTORY_DATA=False
 ```
 
-### 3. 获取企业微信机器人Webhook
+### 3. 获取企业微信机器人 Webhook
 
 1. 在企业微信群中添加机器人
-2. 获取机器人的Webhook URL
-3. 将URL配置到 `WECHAT_WEBHOOK_URL` 中
+2. 获取机器人的 Webhook URL
+3. 将 URL 配置到 `WECHAT_WEBHOOK_URL` 中
 
 ## 使用方法
 
@@ -146,7 +204,7 @@ python web.py
 
 #### 持仓页面示例与链接
 
-- 在线页面链接：[`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+- 在线页面链接：[`https://alpha.zf-talk.com/`](https://alpha.zf-talk.com/)
 
 - 中文示例截图：
 
@@ -175,7 +233,7 @@ python main.py --config /path/to/.env
 
 ## 监控逻辑
 
-1. **数据获取**: 每分钟从API获取当前持仓数据
+1. **数据获取**: 每分钟从 API 获取当前持仓数据
 2. **数据保存**: 将当前数据保存为 `current.json`，并根据配置决定是否保存到 `data/` 目录
 3. **变化检测**: 与上次数据 `last.json` 进行比较
 4. **交易分析**: 识别以下交易行为：
@@ -189,7 +247,7 @@ python main.py --config /path/to/.env
 
 ## 通知格式
 
-系统会发送格式化的Markdown消息，包含：
+系统会发送格式化的 Markdown 消息，包含：
 
 - 🚨 交易提醒标题
 - ⏰ 检测时间
@@ -197,8 +255,8 @@ python main.py --config /path/to/.env
 - 🤖 按模型分组的交易详情（包含模型持仓链接）
 - 📈📉 交易类型图标
 
+通知示例:
 
-通知示例: 
 ```
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-28 22:30:56
@@ -211,12 +269,13 @@ python main.py --config /path/to/.env
 ## 日志文件
 
 系统会在 `logs/` 目录下生成日志文件：
+
 - `trading_monitor.log`: 主要操作日志
 
 ## 注意事项
 
 1. **首次运行**: 第一次运行时会跳过比较，因为不存在历史数据
-2. **网络连接**: 确保服务器能够访问API和企业微信接口
+2. **网络连接**: 确保服务器能够访问 API 和企业微信接口
 3. **权限配置**: 确保企业微信机器人有发送消息的权限
 4. **数据保存**: 系统默认不保存历史数据到`data/`目录，如需保存历史数据请设置 `SAVE_HISTORY_DATA=True`
 5. **数据安全**: `current.json` 和 `last.json` 会保存在本地，请注意数据安全
@@ -226,12 +285,14 @@ python main.py --config /path/to/.env
 ### 常见问题
 
 1. **通知发送失败**
-   - 检查企业微信Webhook URL是否正确
+
+   - 检查企业微信 Webhook URL 是否正确
    - 确认机器人没有被移除或禁用
 
-2. **API获取失败**
+2. **API 获取失败**
+
    - 检查网络连接
-   - 确认API地址是否正确
+   - 确认 API 地址是否正确
 
 3. **配置文件错误**
    - 检查 `.env` 文件格式
@@ -239,7 +300,7 @@ python main.py --config /path/to/.env
 
 ### 调试模式
 
-使用DEBUG日志级别获取更详细的调试信息：
+使用 DEBUG 日志级别获取更详细的调试信息：
 
 ```bash
 python main.py --log-level DEBUG
@@ -253,7 +314,7 @@ python main.py --log-level DEBUG
 
 ## 许可证
 
-本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 贡献
 
@@ -267,12 +328,8 @@ python main.py --log-level DEBUG
 
 如有问题或建议，请通过以下方式联系：
 
-- 创建 [GitHub Issue](https://github.com/okay456okay/nof1.ai.monitor/issues)
-- X (Twitter): [@okay456okay](https://x.com/okay456okay)
-- 微信公众号：远见拾贝
-- 网站: [远见拾贝 - 用远见洞察，赚确定性的钱](https://www.insightpearl.com/)
-
-<img src="images/InSightPearl21_qrcode.jpg" alt="远见拾贝公众号二维码" width="150" height="150">
+- 创建 [GitHub Issue](https://github.com/sniperyen/nof1.ai.monitor/issues)
+- X (Twitter): [@zf_talk](https://x.com/zf_talk)
 
 ---
 

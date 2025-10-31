@@ -12,7 +12,7 @@ This project monitors AI large models' crypto trading on Alpha Arena and sends n
 - Positions web page: built-in Flask app showing positions in a table; auto refresh every 15s; language switch (zh/en)
 - Detailed logs and flexible configuration via environment variables
 
-**Access positions page:** [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+**Access positions page:** [`https://alpha.zf-talk.com/`](https://alpha.zf-talk.com/)
 
 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
   <div>
@@ -77,7 +77,7 @@ python web.py  # default port 5010
 
 #### Positions page samples and link
 
-- Online page: [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+- Online page: [`https://alpha.zf-talk.com/`](https://alpha.zf-talk.com/)
 
 - Chinese sample screenshot:
 
@@ -104,4 +104,3 @@ python main.py --test
 ## License
 
 MIT
-

@@ -1,0 +1,92 @@
+services:
+  # 主监控服务
+  monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nof1-monitor:latest
+    container_name: nof1_monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      # 持久化数据和日志
+      - ./data:/app/data
+      - ./logs:/app/logs
+      # 在宿主机创建 JSON 文件（用于 Web 服务读取）
+      - ./json_files:/app/json_files
+    networks:
+      - nof1_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import os; exit(0 if os.path.exists('current.json') or os.path.exists('json_files/current.json') else 1)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+  # Web 展示服务
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nof1-monitor:latest
+    container_name: nof1_web
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - FLASK_ENV=production
+    command: ["python", "web.py"]
+    ports:
+      - "5010:5010"
+    volumes:
+      # Web 服务只读访问
+      - ./data:/app/data:ro
+      - ./logs:/app/logs:ro
+      - ./json_files:/app/json_files:ro
+    networks:
+      - nof1_network
+    depends_on:
+      monitor:
+        condition: service_started
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+networks:
+  nof1_network:
+    driver: bridge
+    name: nof1_network
